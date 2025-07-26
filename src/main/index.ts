@@ -42,7 +42,7 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   
-  //let py = spawn('python', [path.join(app.getAppPath(), 'tfblocks-backend/main.py')])
+  //let backend = spawn('python', [path.join(app.getAppPath(), 'tfblocks-backend/main.py')])
   let backend = execFile(path.join(app.getAppPath(), 'src/main/backend'))
   let port = ''; // Default port
   let portSet = false;
