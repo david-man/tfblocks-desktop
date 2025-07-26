@@ -6,11 +6,11 @@ import Blocks from './Blocks'
 const Toolbox = (props : any) => {
     const [menuOn, setMenuOn] = useState('Common')
     const Choice = (props : any) => {
-        return <div className = {`w-full flex justify-center items-center ${menuOn == props.choice ? 'bg-gray-200' : ''}`}>
-                    <button className = 'w-1/4 cursor-pointer aspect-square mt-[18px] mb-[6px] flex flex-col justify-center items-center' onClick = {() => setMenuOn(props.choice)}>
+        return <div className = {`w-full flex flex-col justify-center items-center ${menuOn == props.choice ? 'bg-gray-200' : ''}`}>
+                    <button className = 'w-1/4 min-w-[30px] cursor-pointer aspect-square mt-[18px] mb-[6px] flex flex-col justify-center items-center' onClick = {() => setMenuOn(props.choice)}>
                         <div className = {`w-full h-full rounded-full ${props.bgColor} border-black border-1`}></div>
-                        <p className = "text-[12px] text-center">{props.choice}</p>
                     </button>
+                    <p className = "text-[12px] text-center break-all">{props.choice}</p>
                 </div>
     }
     
@@ -24,7 +24,7 @@ const Toolbox = (props : any) => {
                 <Choice choice = 'Recurrent' bgColor = 'bg-lime-400'></Choice>
                 <Choice choice = 'Custom' bgColor = 'bg-pink-400'></Choice>
             </div>
-            <div className = 'w-7/10 h-full max-w-7/10'>
+            <div className = 'w-7/10 h-full'>
                 <Blocks activeID = {props.activeID} menu = {menuOn}/>
             </div>
         </div>

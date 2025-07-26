@@ -12,16 +12,21 @@ const CustomMatrixOptions = (props : any) =>
         const filePath = window.electron.webUtils.getPathForFile(file)
         if(file)
         {
-            try{
-                const resp = await axios.post(`http://localhost:8080/api/getMatrixShape/`, {'file_path': filePath, 'type': 'customMatrix'})
-                if(resp.status == 200){
-                    props.setDataShape(resp.data.data_shape)
-                    props.setFilePath(window.electron.webUtils.getPathForFile(file))
+            electronPort.getPort().then(async (port) => {
+                try{
+                    const resp = await axios.post(`http://localhost:${port}/api/getMatrixShape/`, {'file_path': filePath, 'type': 'customMatrix'})
+                    if(resp.status == 200){
+                        props.setDataShape(resp.data.data_shape)
+                        props.setFilePath(window.electron.webUtils.getPathForFile(file))
+                    }
                 }
-            }
-            catch{
-                alert("Matrix upload failed!")
-            }
+                catch{
+                    alert("Matrix upload failed!")
+                }
+            }).catch((error) => {
+                console.error("Error getting port:", error);
+                alert("There was an error connecting to the backend server. Please ensure it is running.");
+            });
         }
     }
     return (

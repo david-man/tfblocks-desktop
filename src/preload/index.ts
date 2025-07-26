@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
@@ -10,6 +10,10 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
+    contextBridge.exposeInMainWorld('electronDialog', {
+      openDialog: (method, config) => ipcRenderer.invoke('dialog', method, config)
+    });
+    contextBridge.exposeInMainWorld('electronPort', {getPort: () => ipcRenderer.invoke('getPort')});
   } catch (error) {
     console.error(error)
   }

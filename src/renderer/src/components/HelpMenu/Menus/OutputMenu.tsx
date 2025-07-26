@@ -1,7 +1,7 @@
 import Link from "../../../link"
 
 const OutputMenu = () => {
-    return <div className = 'w-full h-95/100 flex flex-col items-center overflow-y-scroll rounded-3xl'>
+    return <div className = 'w-full h-95/100 flex flex-col items-center overflow-y-auto rounded-3xl'>
         <p className = "text-3xl text-center p-2 ">Output Layers</p>
         <hr className = 'w-5/6 border-black border-1 rounded-2xl'></hr>
         <li>Output Layers simply describe the shape of &nbsp;<i>a singular</i>&nbsp; output.&nbsp;<i>In other words, our shape system ignores the batch dimension</i></li>

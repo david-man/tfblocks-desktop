@@ -57,8 +57,8 @@ function PreApp() {
             <div className = "h-1/10 m-1 bg-white">
               <Header/>
             </div>
-            <div className = "h-9/10 w-full flex mb-2 relative">
-              <div className = "w-23/100 min-w-fit h-full mt-1 ml-1 mb-1 bg-white">
+            <div className = "h-9/10 w-full flex mb-2 relative overflow-x-clip">
+              <div className = "w-25/100 h-full mt-1 ml-1 mb-1 bg-white">
                 <Toolbox activeID = {activeID}/>
               </div>
               <div className = "flex-grow h-full mt-1 mr-1 mb-1 bg-white">

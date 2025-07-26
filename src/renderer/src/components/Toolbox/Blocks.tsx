@@ -44,7 +44,7 @@ const Blocks = (props : any) => {
                 <DragElement id = {'reshape'} name = {'Reshape Node'} activeID = {activeID} color = 'bg-stone-300'></DragElement>  
         </>)],
         ['Recurrent', (<>
-            {/* <DragElement id = {'recurrent_head'} name = {'Recurrent Head'} activeID = {activeID} color = 'bg-lime-400'></DragElement> */}
+            <DragElement id = {'recurrent_head'} name = {'Recurrent Head'} activeID = {activeID} color = 'bg-lime-400'></DragElement>
                 <DragElement id = {'lstm'} name = {'LSTM'} activeID = {activeID} color = 'bg-lime-400'></DragElement>
                 <DragElement id = {'gru'} name = {'GRU'} activeID = {activeID} color = 'bg-lime-400'></DragElement>
                 <DragElement id = {'rnn'} name = {'RNN'} activeID = {activeID} color = 'bg-lime-400'></DragElement>

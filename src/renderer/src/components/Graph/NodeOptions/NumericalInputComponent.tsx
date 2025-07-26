@@ -3,11 +3,15 @@ const InputComponent = (props : any) => {
     const allowNegative = props?.allowNegative ? props.allowNegative : false;
     const allowDecimal = props?.allowDecimal ? props.allowDecimal : false
     const topPadding = (props.topPadding !== undefined) ? props.topPadding : true
+    const textSize = (props.textSize !== undefined) ? props.textSize : 'text-[10px]'
+    const fieldSize = (props.fieldSize !== undefined) ? props.fieldSize : 'w-[40px]'
+    const textColor = (props.textColor !== undefined) ? props.textColor : 'text-black'
+    const borderColor = (props.borderColor !== undefined) ? props.borderColor : 'border-black'
 
     return (
-    <div className = {`flex flex-row w-full items-center justify-center p-1 ${topPadding ? 'pt-2' : 'pt-1'} text-[10px]`}>
-        <label htmlFor={props.id} className = "pr-[3px]">{props.label} </label>
-        <input id = {props.id} type = "number" className = "field-sizing-fixed w-[40px] border-1 rounded-sm border-black nopan nodrag text-center"
+    <div className = {`${textColor} flex flex-row w-full items-center justify-center p-1 ${topPadding ? 'pt-2' : 'pt-1'} ${textSize}`}>
+        <label htmlFor={props.id} className = "pr-[3px] text-center">{props.label} </label>
+        <input id = {props.id} type = "number" className = {`field-sizing-fixed ${fieldSize} border-1 rounded-sm ${borderColor} nopan nodrag text-center`}
         onChange = {(evt) => {
             let input = evt.target.value
             let neg = false
@@ -30,7 +34,7 @@ const InputComponent = (props : any) => {
                 input = input.replace(/[^0-9]/g, '');
             }
             if(props.filter){
-                input = props.filter(input) ? input : ''
+                input = (props.filter(input) !== undefined) ? props.filter(input) : ''
             }
             props.setFunction(input === '' ? NaN : (neg ? -Number(input) : Number(input)))
             

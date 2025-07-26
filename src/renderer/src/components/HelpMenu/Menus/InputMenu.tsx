@@ -1,5 +1,5 @@
 const InputMenu = () => {
-    return <div className = 'w-full h-95/100 flex flex-col items-center overflow-y-scroll rounded-3xl'>
+    return <div className = 'w-full h-95/100 flex flex-col items-center overflow-y-auto rounded-3xl'>
         <p className = "text-3xl text-center p-2 ">Input Layers</p>
         <hr className = 'w-5/6 border-black border-1 rounded-2xl m-5'></hr>
         <li>Input Layers simply describe the shape of&nbsp;<i>a singular</i>&nbsp; input.&nbsp;<i>In other words, our shape system ignores the batch dimension</i></li>

@@ -9,16 +9,16 @@ const DropoutOptions = (props : any) => {
     return (
     <div className = "w-[80px] flex flex-col justify-center items-center">
         <label htmlFor = {`${props.id}_text`}>Type:</label>
-            <div className = "w-4/5 border-1 border-black text-[0.5rem] flex justify-center items-center" >
-                <select id = {`${props.id}_text`} value = {props.dim} onChange = {handleDimChange} >
-                    <option value = "indiv">Individual</option>
-                    <option value = "1d">Spatial 1d</option>
-                    <option value = "2d">Spatial 2d</option>
-                    <option value = "3d">Spatial 3d</option>
-                </select>
-            </div>
+        <div className = "w-4/5 border-1 border-black text-[0.5rem] flex justify-center items-center" >
+            <select id = {`${props.id}_text`} value = {props.dim} onChange = {handleDimChange} >
+                <option value = "indiv">Individual</option>
+                <option value = "1d">Spatial 1d</option>
+                <option value = "2d">Spatial 2d</option>
+                <option value = "3d">Spatial 3d</option>
+            </select>
+        </div>
         <InputComponent id = {`${props.id}_text_1`} setFunction={(new_rate : number) => {
-            if(!new_rate || new_rate <= 100)props.set_rate(new_rate)}} value = {props.rate} label = {"Rate(%): "}></InputComponent>
+            if(new_rate >= 0 && new_rate <= 1)props.set_rate(new_rate)}} value = {props.rate} label = {"Rate: "} allowDecimal = {true}></InputComponent>
     </div>)
 }
 export default DropoutOptions

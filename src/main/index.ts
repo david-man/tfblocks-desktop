@@ -7,8 +7,8 @@ import path from 'path'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1200,
+    height: 800,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -43,8 +43,24 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   let py = spawn('python', [path.join(app.getAppPath(), 'tfblocks-backend/main.py')])
-  py.stdout.on('data', data => console.log('data : ', data.toString()))
+  let port = '8080'; // Default port
+  let portSet = false;
+  py.stdout.on('data', data => 
+  {
+    if(data.toString().includes('PORTNUM:') && !portSet) {
+      port = data.toString().split('PORTNUM:')[1].trim();
+      port = port.replace(/[^0-9]/g, ''); // Ensure port is numeric
+      console.log(`Backend server running on port: ${port}`);
+      process.env['BACKEND_PORT'] = port; // Set the port in the environment variable
+      portSet = true; // Set the flag to true to avoid multiple assignments
+    }
+  }
+  
+    
+  )
+
   electronApp.setAppUserModelId('com.electron')
+  const { dialog } = require('electron');
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -55,6 +71,12 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.handle('dialog', (event, method, params) => {       
+    return dialog[method](params);
+  });
+  ipcMain.handle('getPort', () => {       
+    return port;
+  });
 
   createWindow()
 
@@ -63,6 +85,8 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
