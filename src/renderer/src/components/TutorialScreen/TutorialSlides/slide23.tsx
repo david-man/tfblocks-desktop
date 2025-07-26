@@ -16,11 +16,7 @@ const Slide23 = ({setHole} : any) => {
             </div>
             <div className = 'absolute z-5 h-full w-full flex flex-col justify-center items-center'>
                 <p className = 'text-[25px] text-white text-center p-[20px]'>Clicking on it will verify your model.</p>
-                <p className = 'text-[25px] text-white text-center p-[20px]'>If it's valid, it'll compile it and return the compiled model!</p>
-                
-            </div>
-            <div className = 'absolute z-5 h-2/10 w-full flex bottom-0'>
-                <p className = 'text-[25px] text-white text-center p-[12px]'>(Note: Using the Desktop version of the app will turn this button into a 'train' button that you can use to train a model!)</p>
+                <p className = 'text-[25px] text-white text-center p-[20px]'>If it's valid, it'll compile it, and you'll be guided toward the training step!</p>
             </div>
         </>
     )
