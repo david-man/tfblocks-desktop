@@ -177,6 +177,6 @@ def saveLatestModel():
 if __name__ == '__main__':
     port = find_free_port()
     print("PORTNUM: ", port)
-    app.run(host='localhost', port=port, debug = True)
+    app.run(host='localhost', port=port, debug = False, use_reloader=False)  # Set use_reloader to False to avoid multiple instances
     
     #gunicorn main:app

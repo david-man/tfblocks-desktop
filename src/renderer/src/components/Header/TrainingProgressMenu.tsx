@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { CircularProgressbarWithChildren, buildStyles } from 'react-circular-progressbar';
 import "react-circular-progressbar/dist/styles.css";
+import portController from "@renderer/controllers/portController";
 const ProgressMenu = (props : any) => {
     const totalEpochs = props.epochs
     const usingValidation = props.usingValidation
-
+    const {get_port} = portController()
     const [clicks, setClicks] = useState(0);
     const seconds = useRef(5);
     const [epochsOn, setEpochsOn] = useState(0);
@@ -13,36 +14,31 @@ const ProgressMenu = (props : any) => {
     const [latestLoss, setLatestLoss] = useState(0);
     const [trainingComplete, setTrainingComplete] = useState(false);
     useEffect(() => {
-        electronPort.getPort().then(async (port) => {
-            console.log(port)
-            const interval = setInterval(async () => {
-                    const resp = await axios.get(`http://localhost:${port}/api/getTrainingLogs/`)
-                    try{
-                        const data = resp.data;
-                        setEpochsOn(data['epochs']);
-                        setLatestLoss(data['loss']);
-                        if(usingValidation)
-                        {
-                            setLatestValLoss(data['val_loss']);
-                        }
-                        if(data['training_complete'])
-                        {
-                            setTrainingComplete(true);
-                            clearInterval(interval);
-                        }
+        const interval = setInterval(async () => {
+                const resp = await axios.get(`http://localhost:${get_port()}/api/getTrainingLogs/`)
+                try{
+                    const data = resp.data;
+                    setEpochsOn(data['epochs']);
+                    setLatestLoss(data['loss']);
+                    if(usingValidation)
+                    {
+                        setLatestValLoss(data['val_loss']);
                     }
-                    catch (error) {
+                    if(data['training_complete'])
+                    {
                         setTrainingComplete(true);
                         clearInterval(interval);
                     }
-                }, 1000)
-            return () => {
-                clearInterval(interval)
-            }
-        }).catch((error) => {
-                console.error("Error getting port:", error);
-                alert("There was an error connecting to the backend server. Please ensure it is running.");
-            });
+                }
+                catch (error) {
+                    setTrainingComplete(true);
+                    clearInterval(interval);
+                }
+            }, 1000)
+        return () => {
+            clearInterval(interval)
+        }
+        
     }, [])
 
     useEffect(() => {

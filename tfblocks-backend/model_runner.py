@@ -317,7 +317,7 @@ def build_model(input_shape, networks, networks_compile_order, input_handle_dict
     def assembleRNNs():
         @keras.saving.register_keras_serializable()
         class CustomRNNCell(keras.Layer):#REMAKE FOR WEIGHTS
-            def __init__(self, input_shape, state_shape, rec_node_id, run_order):
+            def __init__(self, input_shape, state_shape, rec_node_id, run_order, all_layers = layers):
                 super().__init__()
                 self.input_size = input_shape
                 self.state_size = state_shape
@@ -325,9 +325,10 @@ def build_model(input_shape, networks, networks_compile_order, input_handle_dict
                 self.run_order = run_order
                 self.rec_node_id = rec_node_id
                 self.raw_id = self.rec_node_id.replace("rec_hidden_", "")
+                self.all_layers = all_layers
                 self.layers = []
                 for node in self.run_order:
-                    if(node != rec_node_id and node in layers):
+                    if(node != rec_node_id and node in all_layers):
                         self.layers.append(layers[node])#forces Keras to acknowledge the existence of the inner layers
             def call(self, inputs, states):
                 handle_results[f'{self.rec_node_id}|timestep_handle'] = inputs
@@ -344,6 +345,16 @@ def build_model(input_shape, networks, networks_compile_order, input_handle_dict
                     if(node in layers and node != self.rec_node_id):
                         build_node(node)
                 super(CustomRNNCell, self).build(input_shape)
+            def get_config(self): 
+                return {
+                    'input_size': self.input_size,
+                    'state_size': self.state_size,
+                    'output_size': self.output_size,
+                    'rec_node_id': self.rec_node_id,
+                    'run_order': self.run_order,
+                    'raw_id': self.raw_id,
+                    'all_layers': self.all_layers
+                }
             
 
         for network in networks_compile_order:

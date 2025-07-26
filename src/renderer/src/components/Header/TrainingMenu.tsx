@@ -2,8 +2,10 @@ import { useState } from "react";
 import InputComponent from "../Graph/NodeOptions/NumericalInputComponent";
 import axios from "axios";
 import Link from "@renderer/link";
+import portController from "@renderer/controllers/portController";
 
 const TrainingMenu = (props : any) => {
+    const {get_port} = portController()
     const [batchSize, setBatchSize] = useState<number>(16);
     const epochs = props.epochs
     const [eta, setEta] = useState<number>(0.0001);
@@ -152,29 +154,23 @@ const TrainingMenu = (props : any) => {
                                 return;
                             }
                             else{
-                                electronPort.getPort().then(async (port) => {
-                                    console.log(port)
-                                    const response = await axios.post(`http://localhost:${port}/api/trainModel/`, {
-                                        batch_size: batchSize,
-                                        epochs: epochs,
-                                        eta: eta,
-                                        ttsplit: ttsplit,
-                                        optimizer: optimizer,
-                                        loss: loss
-                                    })
-                                    if(response.status == 200)
-                                    {
-                                        alert('Training started successfully!');
-                                        props.proceed();
-                                    }
-                                    else{
-                                        alert('Error starting training: ' + response.data.message);
-                                        props.turnOff();
-                                    }
-                                }).catch((error) => {
-                                    console.error("Error getting port:", error);
-                                    alert("There was an error connecting to the backend server. Please ensure it is running.");
+                                const response = await axios.post(`http://localhost:${get_port()}/api/trainModel/`, {
+                                    batch_size: batchSize,
+                                    epochs: epochs,
+                                    eta: eta,
+                                    ttsplit: ttsplit,
+                                    optimizer: optimizer,
+                                    loss: loss
                                 })
+                                if(response.status == 200)
+                                {
+                                    alert('Training started successfully!');
+                                    props.proceed();
+                                }
+                                else{
+                                    alert('Error starting training: ' + response.data.message);
+                                    props.turnOff();
+                                }
                             }
                         }}>
                             <div className = 'min-w-fit h-[50px] border-1 rounded-2xl border-black bg-green-400 flex justify-center items-center cursor-pointer'>

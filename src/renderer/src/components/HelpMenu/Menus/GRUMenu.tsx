@@ -13,7 +13,7 @@ const GRUMenu = () => {
             <li><b>Use Case</b>: Time-Series Forecasting, Natural Language Processing</li>
             <li><b>Customizable Parameters</b>
                 <ul className = 'list-disc list-inside pl-4'>
-                    <li><b>Hidden Units</b> — The number of units in a hidden state</li>
+                    <li><b>Hidden Units</b> — The number of units in the memory state</li>
                     <li><b>Seq2Seq</b> — Whether to do a Seq2One or Seq2Seq transformation</li>
                 </ul>
             </li>

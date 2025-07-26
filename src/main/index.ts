@@ -1,9 +1,8 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
+import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { spawn } from 'child_process'
-import path from 'path'
+import { execFile, spawn } from 'child_process'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -42,10 +41,12 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  let py = spawn('python', [path.join(app.getAppPath(), 'tfblocks-backend/main.py')])
-  let port = '8080'; // Default port
+  
+  //let py = spawn('python', [path.join(app.getAppPath(), 'tfblocks-backend/main.py')])
+  let backend = execFile(path.join(app.getAppPath(), 'src/main/backend'))
+  let port = ''; // Default port
   let portSet = false;
-  py.stdout.on('data', data => 
+  backend.stdout.on('data', data => 
   {
     if(data.toString().includes('PORTNUM:') && !portSet) {
       port = data.toString().split('PORTNUM:')[1].trim();
@@ -54,10 +55,7 @@ app.whenReady().then(() => {
       process.env['BACKEND_PORT'] = port; // Set the port in the environment variable
       portSet = true; // Set the flag to true to avoid multiple assignments
     }
-  }
-  
-    
-  )
+  })
 
   electronApp.setAppUserModelId('com.electron')
   const { dialog } = require('electron');

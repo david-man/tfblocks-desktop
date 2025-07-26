@@ -1,6 +1,6 @@
 import { type Graph } from './controllers/nodeController'
 import { useShallow } from 'zustand/shallow'
-import { useState, type MouseEvent} from 'react'
+import { useEffect, useRef, useState, type MouseEvent} from 'react'
 import { ReactFlowProvider, useReactFlow} from '@xyflow/react'
 import { DndContext, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core'
 import {restrictToWindowEdges} from '@dnd-kit/modifiers'
@@ -14,6 +14,8 @@ import nodeController from "./controllers/nodeController";
 import HelpMenu from './components/HelpMenu/HelpMenu'
 import helpMenuController from './controllers/helpMenuController'
 import TutorialMenu from './components/TutorialScreen/Tutorial'
+import portController from './controllers/portController'
+import Link from './link'
 export type MousePosn = {
   x : number,
   y : number
@@ -46,7 +48,7 @@ function PreApp() {
   }
 
   return (
-    <div onMouseMove = {handleMouseMove} className = "w-full h-full font-[DynaPuff] font-weight-[400] relative">
+    <div onMouseMove = {handleMouseMove} className = "w-full h-full font-[DynaPuff] font-weight-[400] relative overflow-x-clip overflow-y-clip">
         <DndContext onDragEnd = {handleDragEnd} onDragStart = {handleDragStart} modifiers = {[restrictToWindowEdges]}>
           {showTutorial ? 
           <div className = 'absolute top-0 left-0 w-full h-full z-1'>
@@ -75,9 +77,47 @@ function PreApp() {
   )
 }
 
+function LoadingScreen() {
+  const [refresh, setRefresh] = useState(0)
+  const dots = useRef<string>('...')
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if(dots.current === '...') {
+        dots.current = '.'
+      } else {
+        dots.current += '.'
+      }
+      setRefresh(prev => prev + 1)
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+  return (
+    <div className = "w-full h-full flex flex-col justify-center items-center">
+      <img src = "loading.gif"></img>
+      <div className = "text-2xl font-bold">Waiting for backend to start{dots.current}</div>
+      <div className = "text-[10px] font-bold">Loading screen made by <Link href = "https://dribbble.com/shots/3306683-Tetris-shaped-loader">Vitaly Silkin</Link></div>
+    </div>
+  )
+}
 function App() {
-  return (<ReactFlowProvider>
-    <PreApp />
-  </ReactFlowProvider>)
+  const [ready, setReady] = useState(false);
+  const {set_port} = portController()
+  useEffect(() => {
+    const checkReady = setInterval(() =>{
+      electronPort.getPort().then(async (port : string) => {
+        if(port != ''){
+          setReady(true);
+          clearInterval(checkReady);
+          set_port(port)
+        }
+      }).catch((error) => {
+        console.error("Error getting port from Electron:", error);
+      })
+    }, 1000)
+  }, []);
+  return (
+  ready ? <ReactFlowProvider>
+    <PreApp/>
+  </ReactFlowProvider> : <LoadingScreen />)
 }
 export default App

@@ -1,7 +1,9 @@
+import portController from "@renderer/controllers/portController"
 import axios from "axios"
 const InputOptions = (props : any) => 
 {
     const id = props.id
+    const {get_port} = portController()
     const handleInput = async (event : any) => {
         const file : File = event.target.files[0]
         const inputElem = document.getElementById(`file_input_${id}`) as HTMLInputElement | null;
@@ -11,22 +13,16 @@ const InputOptions = (props : any) =>
         const filePath = window.electron.webUtils.getPathForFile(file)
         if(file)
         {
-            electronPort.getPort().then(async (port) => {
-                try{
-                    console.log(port)
-                    const resp = await axios.post(`http://localhost:${port}/api/getMatrixShape/`, {'file_path': filePath, 'type': 'input'})
-                    if(resp.status == 200){
-                        props.setDataShape(resp.data.data_shape)
-                        props.setFilePath(window.electron.webUtils.getPathForFile(file))
-                    }
+            try{
+                const resp = await axios.post(`http://localhost:${get_port()}/api/getMatrixShape/`, {'file_path': filePath, 'type': 'input'})
+                if(resp.status == 200){
+                    props.setDataShape(resp.data.data_shape)
+                    props.setFilePath(window.electron.webUtils.getPathForFile(file))
                 }
-                catch{
-                    alert("Matrix upload failed!")
-                }
-            }).catch((error) => {
-                console.error("Error getting port:", error);
-                alert("There was an error connecting to the backend server. Please ensure it is running.");
-            });
+            }
+            catch{
+                alert("Matrix upload failed!")
+            }
         }
     }
     return (

@@ -4,10 +4,11 @@ import nodeController from '../../controllers/nodeController'
 import propertyController from '../../controllers/propertyController'
 import axios from 'axios'
 import type { Node } from '@xyflow/react'
-import { use, useEffect, useState } from 'react'
+import { useState } from 'react'
 import CompilationMenu from './CompilationMenu'
 import TrainingMenu from './TrainingMenu'
 import ProgressMenu from './TrainingProgressMenu'
+import portController from '../../controllers/portController'
 const Header = () => {
     const [epochs, setEpochs] = useState<number>(32);
     const [ttsplit, setTTsplit] = useState<number>(0.2);
@@ -16,6 +17,9 @@ const Header = () => {
     const {get_map, get_properties} = propertyController()
     const {get_dep_map, get_child_map, get_network_heads, get_dependencies, get_children} = dependencyController()
     const [headerState, setHeaderState] = useState('header')
+    const {get_port} = portController()
+
+    const [recurrentHeadIn, setRecurrentHeadIn] = useState(false)
 
     const findNetwork = (id : String) => {
         let to_ret = "hanging"
@@ -48,34 +52,29 @@ const Header = () => {
 
     const upload = async () => {
         const filtered_network_heads = get_network_heads().filter((id : string) => (id != 'out'))
-        electronPort.getPort().then(async (port) => {
-            try{
-                
-                const resp = await axios.post(`http://localhost:${port}/api/sendModel/`, {
-                    active_nodes : [...nodes.map((node : Node) => {
-                        return {id: node.id, type: node.type}
-                    }).filter((node) => findNetwork(node.id) != 'hanging')],//active nodes defined as nodes that aren't floating around
-                    properties_map: [...get_map()],
-                    dependency_map : [...get_dep_map()],
-                    child_map : [...get_child_map()],
-                    network_heads : filtered_network_heads
-                })
-                if(resp.status != 200){
-                    alert("There was an error in the backend somewhere! Sorry :(")
-                }
-                
+        try{
+            const resp = await axios.post(`http://localhost:${get_port()}/api/sendModel/`, {
+                active_nodes : [...nodes.map((node : Node) => {
+                    return {id: node.id, type: node.type}
+                }).filter((node) => findNetwork(node.id) != 'hanging')],//active nodes defined as nodes that aren't floating around
+                properties_map: [...get_map()],
+                dependency_map : [...get_dep_map()],
+                child_map : [...get_child_map()],
+                network_heads : filtered_network_heads
+            })
+            if(resp.status != 200){
+                alert("There was an error in the backend somewhere! Sorry :(")
             }
-            catch (err){
-                alert("There was an error uploading your model! Perhaps the backend server is down :(")
-            }
-        }).catch((error) => {
-            console.error("Error getting port:", error);
-            alert("There was an error connecting to the backend server. Please ensure it is running.");
-        });
+            
+        }
+        catch (err){
+            alert("There was an error uploading your model! Perhaps the backend server is down :(")
+        }
     }
 
     const handleCompileClick = async () => {
         let send = true;
+        setRecurrentHeadIn(false)
         nodes.map((node : Node) => {
             const id = node.id
             if(node.type == 'recurrent_head'){
@@ -85,6 +84,7 @@ const Header = () => {
                         send = false
                     }
                 }
+                setRecurrentHeadIn(true)
             }
             else {
                 if((!get_properties(id) || !(get_properties(id)?.valid)) && findNetwork(id) != 'hanging'){
@@ -111,27 +111,27 @@ const Header = () => {
         {
             if (!result.canceled && result.filePaths.length > 0) {
                 const folder_path = result.filePaths[0];
-                electronPort.getPort().then(async (port) => {
-                    try{
-                        const resp = await axios.post(`http://localhost:${port}/api/saveLatestModel/`, {
-                            folder_path: folder_path
-                        })
-                        if(resp.data.message.includes('No model to save')){
-                            alert("You don't have any models to save! Please compile or train a model first.")
+                try{
+                    const resp = await axios.post(`http://localhost:${get_port()}/api/saveLatestModel/`, {
+                        folder_path: folder_path
+                    })
+                    if(resp.data.message.includes('No model to save')){
+                        alert("You don't have any models to save! Please compile or train a model first.")
+                    }
+                    else{
+                        if(recurrentHeadIn){
+                            alert("Recurrent heads are not supported in saved models! Do not try to load this model. It will not work.")
                         }
                         else{
                             alert(`Latest model successfully saved to ${folder_path + '/tfblocks_model.keras'}!`)
                         }
+                        
                     }
-                    catch (err){
-                        alert("There was an error saving your model! Perhaps the backend server is down :(")
-                    }
-                }).catch((error) => {
-                    console.error("Error getting port:", error);
-                    alert("There was an error connecting to the backend server. Please ensure it is running.");
-                });
+                }
+                catch (err){
+                    alert("There was an error saving your model! Perhaps the backend server is down :(")
+                }
             } else {
-                console.log('File selection canceled.');
             }
         }
         );
@@ -150,24 +150,20 @@ const Header = () => {
         }
         else if(headerState == 'training'){
             return <ProgressMenu turnOff = {async () => {
-                electronPort.getPort().then(async (port) => {
-                    const response = await axios.post(`http://localhost:${port}/api/forceTrainingEnd/`)
-                    try{
-                        if(response.data['model saved']){
-                            alert('Training ended successfully! Click the save icon to save it to a file on your computer.')
-                        }
-                        else{
-                            alert('Training ended, but no model was saved, likely due to an error.')
-                        }
-                        setHeaderState('header')
+                const response = await axios.post(`http://localhost:${get_port()}/api/forceTrainingEnd/`)
+                try{
+                    if(response.data['model saved']){
+                        alert('Training ended successfully! Click the save icon to save it to a file on your computer.')
                     }
-                    catch (error) {
-                        alert('There was an error ending training: ' + error.message)
+                    else{
+                        alert('Training ended, but no model was saved, likely due to an error.')
                     }
-                }).catch((error) => {
-                    console.error("Error getting port:", error);
-                    alert("There was an error connecting to the backend server. Please ensure it is running.");
-                });
+                    setHeaderState('header')
+                }
+                catch (error) {
+                    alert('There was an error ending training: ' + error.message)
+                }
+                
             }
             }
             epochs = {epochs} usingValidation = {ttsplit != 0}/>

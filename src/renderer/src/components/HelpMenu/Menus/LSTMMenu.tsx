@@ -13,7 +13,7 @@ const LSTMMenu = () => {
             <li><b>Use Case</b>: Time-Series Forecasting, Natural Language Processing</li>
             <li><b>Customizable Parameters</b>
                 <ul className = 'list-disc list-inside pl-4'>
-                    <li><b>Hidden Units</b> — The number of units in a hidden state</li>
+                    <li><b>Hidden Units</b> — The number of units in the cell & hidden state</li>
                     <li><b>Seq2Seq</b> — Whether to do a Seq2One or Seq2Seq transformation</li>
                 </ul>
             </li>
@@ -29,7 +29,7 @@ const LSTMMenu = () => {
         <p className = 'text-2xl text-center p-1 pt-3'>Guide</p>
         <ul className = 'list-disc list-inside pl-2 pb-3 pr-3'>
             <li>The LSTM, or Long-Short Term Memory, layer is a very common type of Recurrent Layer.</li>
-            <li>It improves on the simple RNN by dividing the memory state into 2 distinct parts: the cell(long-term memory) & hidden(short-term memory) states.</li>
+            <li>It improves on the simple RNN by dividing the memory state into 2 equidimensional, distinct parts: the cell(long-term memory) & hidden(short-term memory) states.</li>
             <li>The different ways that timestep-specific feature vectors impact these two parts is what makes the LSTM so effective.</li>
             <hr className = 'w-4/5 rounded-2xl border-black border-1 m-5' />
             <li>At each timestep, the LSTM starts by concatenating the timestep-specific feature vector with the hidden state to create an intermediate state vector.</li>
